@@ -1,0 +1,19 @@
+- hosts: all
+ 
+  vars:
+   firewall_allowed_tcp_ports:
+    - "22"
+    - "8080"
+    - "8081"
+    - "80"
+
+  roles:
+    - geerlingguy.repo-epel
+    - geerlingguy.firewall
+    - geerlingguy.ansible    
+    - geerlingguy.java
+    - geerlingguy.jenkins
+    - geerlingguy.git
+    - juliovp01.gitlab-centos
+#    - jenscobie.artifactory
+
