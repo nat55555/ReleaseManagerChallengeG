@@ -99,7 +99,7 @@ pipeline {
 
 										//in this step we build the app based on the provided dockerfile
 	
-										app = docker.build("tom/timeoff-management-application"+":$BUILD_NUMBER")
+										app = docker.build("timeoff-management-application"+":$BUILD_NUMBER")
 
 
 							} catch (e) {
@@ -124,7 +124,7 @@ pipeline {
 				script{ 
 							try {
 
-								docker run --name docker-tom -p 8080:8080  'tom/timeoff-management-application:'+${BUILD_NUMBER}
+								docker run --name docker-tom -p 8080:8080  'timeoff-management-application:'+${BUILD_NUMBER}
 
 							} catch (e) {
 								echo('detected failure: Docker Image run')
@@ -142,10 +142,10 @@ pipeline {
 												try {
 
 														stage('Push Docker Images to Nexus Registry'){
-														sh 'docker login -u admin -p changeme NexusDockerRegistryUrl'
-														sh 'docker push NexusDockerRegistryUrl/Imagename}'
-														sh 'docker rmi $(docker images --filter=reference="NexusDockerRegistryUrl/ImageName*" -q)'
-														sh 'docker logout NexusDockerRegistryUrl'
+														sh "docker login -u admin -p changeme 192.168.86.86:8081"
+														sh "docker push 192.168.86.86:8081/'timeoff-management-application:'+${BUILD_NUMBER}}"
+														//sh "docker rmi $(docker images --filter=reference="NexusDockerRegistryUrl/ImageName*" -q)'"
+														sh "docker logout NexusDockerRegistryUrl"
 														}
 
 												} catch (e) {
