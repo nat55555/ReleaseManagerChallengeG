@@ -6,3 +6,8 @@ Release Manager Challenge
 - ansible
 - vagrant
 - virtualbox
+
+## About
+
+This setup allows the CI/CD
+
