@@ -1,11 +1,16 @@
-- hosts: all
+- name: "Install Base"
+  hosts: all
+  become: true
  
   vars:
    firewall_allowed_tcp_ports:
     - "22"
-    - "8080"
     - "8081"
-    - "80"
+    - "443"
+    - "9999"
+   jenkins_http_port: 9999
+   jenkins_plugins:
+    - GitLab
 
   roles:
     - geerlingguy.repo-epel
@@ -14,6 +19,42 @@
     - geerlingguy.java
     - geerlingguy.jenkins
     - geerlingguy.git
-  # - juliovp01.gitlab-centos
-#   - jenscobie.artifactory
 
+- name: "Install gitlab"
+  hosts: all
+  become: true
+
+  vars:
+   firewall_allowed_tcp_ports:
+    - "80"
+    - "8080"
+
+  roles:
+    - geerlingguy.gitlab
+
+- name: "Install nexus"
+  hosts: all
+  become: true
+  roles:    
+    - savoirfairelinux.nexus3-oss
+
+- name: "Mirror a Git repository with Ansible"
+  hosts: all
+  vars:
+    git_dir: /tmp/timeoff-management-application.git
+
+  tasks:
+
+  - name: "Clone the Git repo"
+    git:
+       repo: 'https://github.com/nat55555/timeoff-management-application.git'
+       dest: '{{ git_dir }}'
+       clone: yes
+       update: yes
+
+  - name: "Add alternate remote"
+    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='git@192.168.86.86:example/timeoff-management-application.git'
+    tags: configuration
+ 
+  - name: "Push the repo to alternate remote"
+    shell: 'git --verbose --git-dir={{ git_dir }}/.git push mirrored HEAD'
