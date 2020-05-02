@@ -124,8 +124,8 @@ pipeline {
 				script{ 
 							try {
 								steps{
-									
-								sh "docker run -d --name docker-tom  'timeoff-management-application:${BUILD_NUMBER}'"
+								sh "docker rm dockr-tom"	
+								sh "docker run -d -p 3000:3000 --name docker-tom  'timeoff-management-application:${BUILD_NUMBER}'"
 
 								}
 							} catch (e) {
