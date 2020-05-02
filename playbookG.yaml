@@ -15,6 +15,7 @@
     - GitLab
    gitlab_external_url: "https://192.168.86.86/"
    gitlab_redirect_http_to_https: "false"
+   #gitlab_omniauth_block_auto_create_users: "false"
 
   roles:
     - geerlingguy.repo-epel
@@ -23,6 +24,7 @@
     - geerlingguy.jenkins
     - geerlingguy.git
     - geerlingguy.gitlab
+    - jxn.python-gitlab-modules
 
 - name: "Install ansible"
   hosts: all
@@ -50,9 +52,47 @@
        clone: yes
        update: yes
 
-#  - name: "Add alternate remote"
-#    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='git@192.168.86.86:example/timeoff-management-application.git'
-#    tags: configuration
+#- name: "Create GitLab User"
+#  hosts: all
+#  become: true
+#  tasks:
+#   - gitlab_user:
+#      api_url: https://192.168.86.86/
+#      validate_certs: False
+#      api_username: root
+#      api_password: "5iveL!fe"
+#      name: Gitlab-Admin
+#      username: gitlabadmin
+#      password: gitlabadmin
+#      email: gitlabadmin@example.com
+#      #sshkey_name: MySSH
+#      #sshkey_file: ssh-rsa AAAAB3NzaC1yc...
+#      state: present
+#      group: super_group/mon_group
+#      access_level: owner
+     #delegate_to: localhost
+
+  - name: "Add alternate remote"
+    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='https@192.168.86.86:example/timeoff-management-application.git'
+    tags: configuration
+
+  
+  - name: "Gitlab create project"
+    become: true
+    gitlab_project:
+      server_url: https://192.168.86.86
+      validate_certs: False
+      login_user: root
+      login_password: 5iveL!fe
+      name: example
+      group: ansible
+      issues_enabled: False
+      wiki_enabled: True
+      snippets_enabled: True
+      import_url: https@192.168.86.86:example/timeoff-management-application.git
+      state: present
+    #delegate_to: localhost
  
-#  - name: "Push the repo to alternate remote"
-#    shell: 'git --verbose --git-dir={{ git_dir }}/.git push mirrored HEAD'
+#- name: "Push the repo to alternate remote"
+#  shell: 'git push https://root:5iveL!fe@{{ git_dir }}/.git'
+  #shell: 'git -c http.sslVerify=false --git-dir={{ git_dir }}/.git push mirrored HEAD'
