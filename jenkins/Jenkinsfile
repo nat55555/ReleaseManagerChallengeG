@@ -54,15 +54,6 @@ pipeline {
 
 	stages{
 
-        stage('Limpiar jenkins Workspace') {
-            steps {
-				script{
-						cleanWs()
-						
-				}
-				
-				}
-            }
 
         stage('checkout from git') { 
             steps { 
