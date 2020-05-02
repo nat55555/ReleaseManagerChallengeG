@@ -3,6 +3,6 @@ Release Manager Challenge
 
 ## Pre requisites
 
--- ansible
--- vagrant
--- virtualbox
+- ansible
+- vagrant
+- virtualbox
