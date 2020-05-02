@@ -99,8 +99,8 @@ pipeline {
 
 										//in this step we build the app based on the provided dockerfile
 	
-										app = docker.build("timeoff-management-application"+":$BUILD_NUMBER")
-
+										//app = docker.build("timeoff-management-application"+":$BUILD_NUMBER")
+										sh "docker-compose build"						
 
 							} catch (e) {
 								echo('detected failure: Docker Image build')
@@ -124,9 +124,9 @@ pipeline {
 				script{ 
 							try {
 								steps{
-								sh "docker rm dockr-tom"	
-								sh "docker run -d -p 3000:3000 --name docker-tom  'timeoff-management-application:${BUILD_NUMBER}'"
-
+							//	sh "docker rm docker-tom"	
+							//	sh "docker run -d -p 3000:3000 --name docker-tom  'timeoff-management-application:${BUILD_NUMBER}'"
+								sh "docker-compose up -d"					
 								}
 							} catch (e) {
 								echo('detected failure: Docker Image run')
