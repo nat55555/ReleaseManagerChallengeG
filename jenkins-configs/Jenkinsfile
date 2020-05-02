@@ -126,18 +126,15 @@ pipeline {
 
 										docker run --name docker-tom -p 8080:8080  "tom/timeoff-management-application"+":$BUILD_NUMBER"
 
-
-
 							} catch (e) {
-								echo('detected failure: Docker Image build')
+								echo('detected failure: Docker Image run')
 								stage_actual.add(env.STAGE_NAME)
 								throw(e)
 							}	
 				}
 			}	
 	
-
-    }		
+    } //Docker Image run		
 		
          stage('Push docker Image to Nexus') { 
             steps { 
