@@ -19,6 +19,7 @@
     - "443"
     - "9999"
     - "80"
+    - "3000"
 
    jenkins_http_port: 9999
    jenkins_plugins:
@@ -27,6 +28,8 @@
     - uno-choice
     - slack
     - extensible-choice-parameter
+   jenkins_jobs:
+    - "TESTPIPELINE"
 
    gitlab_external_url: "http://192.168.86.86/"
    gitlab_redirect_http_to_https: "false"
@@ -58,6 +61,7 @@
   become: true
   vars:
     git_dir: /tmp/timeoff-management-application.git
+    gitlab_disable_signup: true
 
   tasks:
 
@@ -66,6 +70,7 @@
       name:
         - docker
         - python-virtualenv
+        - expect
       state: present
     become: true
 
@@ -78,7 +83,7 @@
 
   - name: "Add Jenkins User to docker Group"
     become: true
-    shell: 'groupadd docker; usermod -a -G docker jenkins'
+    shell: 'groupadd docker; usermod -a -G docker jenkins; chmod 777 /var/run/docker.sock'
 
   - name: "Clone the Git repo"
     git:
@@ -110,7 +115,21 @@
     lineinfile: 'dest=/etc/gitlab/gitlab.rb line="{{ item }}"'
     with_items:
       - "gitlab_rails['initial_root_password'] = 'toortoortoor'"
+      - "gitlab_rails['password_authentication_enabled'] = false"
       - "nginx['redirect_http_to_https'] = false"
+
+  - name: "disabling signup"
+    become: true
+    shell: expect -c 'spawn gitlab-rails console production;
+                      expect "%s";
+                      send "x = ApplicationSetting.first\r";
+                      expect "%s";
+                      send "x.signup_enabled = false\r";
+                      expect "%s";
+                      send "x.save!\r";
+                      expect "%s";
+                      send "^D"'
+    when: gitlab_disable_signup
 
   - name: "configuring gitlab"
     become: true
