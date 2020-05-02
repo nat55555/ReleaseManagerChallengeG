@@ -8,29 +8,27 @@
     - "8081"
     - "443"
     - "9999"
+    - "80"
+
    jenkins_http_port: 9999
    jenkins_plugins:
     - GitLab
+   gitlab_external_url: "https://192.168.86.86/"
+   gitlab_redirect_http_to_https: "false"
 
   roles:
     - geerlingguy.repo-epel
-    - geerlingguy.firewall
-    - geerlingguy.ansible    
+    - geerlingguy.firewall    
     - geerlingguy.java
     - geerlingguy.jenkins
     - geerlingguy.git
+    - geerlingguy.gitlab
 
-- name: "Install gitlab"
+- name: "Install ansible"
   hosts: all
-  become: true
-
-  vars:
-   firewall_allowed_tcp_ports:
-    - "80"
-    - "8080"
 
   roles:
-    - geerlingguy.gitlab
+    - geerlingguy.ansible
 
 - name: "Install nexus"
   hosts: all
@@ -52,9 +50,9 @@
        clone: yes
        update: yes
 
-  - name: "Add alternate remote"
-    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='git@192.168.86.86:example/timeoff-management-application.git'
-    tags: configuration
+#  - name: "Add alternate remote"
+#    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='git@192.168.86.86:example/timeoff-management-application.git'
+#    tags: configuration
  
-  - name: "Push the repo to alternate remote"
-    shell: 'git --verbose --git-dir={{ git_dir }}/.git push mirrored HEAD'
+#  - name: "Push the repo to alternate remote"
+#    shell: 'git --verbose --git-dir={{ git_dir }}/.git push mirrored HEAD'
