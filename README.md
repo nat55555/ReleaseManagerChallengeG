@@ -25,3 +25,6 @@ This setup allows the CI/CD
 - Use NON-Admin Accounts in the different tools
 - Setup static code Analyzer
 
+## Author
+
+Natalia Cardona
