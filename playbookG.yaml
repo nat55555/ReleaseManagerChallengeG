@@ -1,6 +1,16 @@
 - name: "Install Base"
   hosts: all
   become: true
+  
+# pre_tasks:
+#   - name: Install Dependencies
+#     yum:
+#       name: "{{ item }}"
+#     become: true
+#     when: ansible_os_family == 'RedHat'
+#     with_items:
+#       - python-virtualenv
+#       - python-gitlab
  
   vars:
    firewall_allowed_tcp_ports:
@@ -12,10 +22,15 @@
 
    jenkins_http_port: 9999
    jenkins_plugins:
-    - GitLab
-   gitlab_external_url: "https://192.168.86.86/"
+    - gitlab-plugin
+    - pipeline-model-definition
+    - uno-choice
+    - slack
+    - extensible-choice-parameter
+
+   gitlab_external_url: "http://192.168.86.86/"
    gitlab_redirect_http_to_https: "false"
-   #gitlab_omniauth_block_auto_create_users: "false"
+   gitlab_omniauth_block_auto_create_users: "false"
 
   roles:
     - geerlingguy.repo-epel
@@ -40,10 +55,30 @@
 
 - name: "Mirror a Git repository with Ansible"
   hosts: all
+  become: true
   vars:
     git_dir: /tmp/timeoff-management-application.git
 
   tasks:
+
+  - name: "Install a list of packages"
+    yum:
+      name:
+        - docker
+        - python-virtualenv
+      state: present
+    become: true
+
+  - name: "Make sure a service is running"
+    systemd:
+      state: started
+      name: docker
+      enabled: yes
+      daemon_reload: yes
+
+  - name: "Add Jenkins User to docker Group"
+    become: true
+    shell: 'groupadd docker; usermod -a -G docker jenkins'
 
   - name: "Clone the Git repo"
     git:
@@ -52,47 +87,57 @@
        clone: yes
        update: yes
 
-#- name: "Create GitLab User"
-#  hosts: all
-#  become: true
-#  tasks:
-#   - gitlab_user:
-#      api_url: https://192.168.86.86/
-#      validate_certs: False
-#      api_username: root
-#      api_password: "5iveL!fe"
-#      name: Gitlab-Admin
-#      username: gitlabadmin
-#      password: gitlabadmin
-#      email: gitlabadmin@example.com
-#      #sshkey_name: MySSH
-#      #sshkey_file: ssh-rsa AAAAB3NzaC1yc...
-#      state: present
-#      group: super_group/mon_group
-#      access_level: owner
-     #delegate_to: localhost
+# - name: "Create GitLab User"
+#   become: true
+#   gitlab_user:
+#     api_url: http://192.168.86.86/
+#     validate_certs: False
+#     api_username: root
+#     api_password: "5iveL!fe"
+#     name: Gitlab-Admin
+#     username: gitlabadmin
+#     password: gitlabadmin
+#     email: gitlabadmin@example.com
+#     #sshkey_name: MySSH
+#     #sshkey_file: ssh-rsa AAAAB3NzaC1yc...
+#     state: present
+#     group: super_group/mon_group
+#     access_level: owner
+#     delegate_to: localhost
+
+  - name: "configuring external url"
+    become: true
+    lineinfile: 'dest=/etc/gitlab/gitlab.rb line="{{ item }}"'
+    with_items:
+      - "gitlab_rails['initial_root_password'] = 'toortoortoor'"
+      - "nginx['redirect_http_to_https'] = false"
+
+  - name: "configuring gitlab"
+    become: true
+    shell: 'gitlab-ctl reconfigure'
 
   - name: "Add alternate remote"
-    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='https@192.168.86.86:example/timeoff-management-application.git'
+    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='http://192.168.86.86:example/timeoff-management-application.git'
     tags: configuration
 
   
-  - name: "Gitlab create project"
-    become: true
-    gitlab_project:
-      server_url: https://192.168.86.86
-      validate_certs: False
-      login_user: root
-      login_password: 5iveL!fe
-      name: example
-      group: ansible
-      issues_enabled: False
-      wiki_enabled: True
-      snippets_enabled: True
-      import_url: https@192.168.86.86:example/timeoff-management-application.git
-      state: present
-    #delegate_to: localhost
+# - name: "Gitlab create project"
+#   become: true
+#   gitlab_project:
+#   server_url: http://192.168.86.86
+#     validate_certs: False
+#     login_user: root
+#     login_password: 5iveL!fe
+#     name: example
+#     group: ansible
+#     issues_enabled: False
+#     wiki_enabled: True
+#     snippets_enabled: True
+#     import_url: http://192.168.86.86/example/timeoff-management-application.git
+#     state: present
+#    delegate_to: localhost
  
-#- name: "Push the repo to alternate remote"
-#  shell: 'git push https://root:5iveL!fe@{{ git_dir }}/.git'
-  #shell: 'git -c http.sslVerify=false --git-dir={{ git_dir }}/.git push mirrored HEAD'
+# - name: "Push the repo to alternate remote"
+#   #shell: 'git push https://root:5iveL!fe@'
+#   #shell: 'git --git-dir={{ git_dir }}/.git push --set-upstream http://192.168.86.86/example&timeoff-management-application.git'
+#   shell: 'cd {{ git_dir }}; git push --set-upstream http://192.168.86.86/example/timeoff-management-application.git'
