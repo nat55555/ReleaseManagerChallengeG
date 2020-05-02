@@ -124,7 +124,7 @@ pipeline {
 				script{ 
 							try {
 
-										docker run --name docker-tom -p 8080:8080  "tom/timeoff-management-application"+":$BUILD_NUMBER"
+								docker run --name docker-tom -p 8080:8080  'tom/timeoff-management-application:'+${BUILD_NUMBER}
 
 							} catch (e) {
 								echo('detected failure: Docker Image run')
