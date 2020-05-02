@@ -123,9 +123,11 @@ pipeline {
             steps { 
 				script{ 
 							try {
+								steps{
+									
+								docker run --name docker-tom -p 3000:3000  'timeoff-management-application:'+${BUILD_NUMBER}
 
-								docker run --name docker-tom -p 8080:8080  'timeoff-management-application:'+${BUILD_NUMBER}
-
+								}
 							} catch (e) {
 								echo('detected failure: Docker Image run')
 								stage_actual.add(env.STAGE_NAME)
