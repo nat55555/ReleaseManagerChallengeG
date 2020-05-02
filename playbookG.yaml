@@ -2,16 +2,6 @@
   hosts: all
   become: true
   
-# pre_tasks:
-#   - name: Install Dependencies
-#     yum:
-#       name: "{{ item }}"
-#     become: true
-#     when: ansible_os_family == 'RedHat'
-#     with_items:
-#       - python-virtualenv
-#       - python-gitlab
- 
   vars:
    firewall_allowed_tcp_ports:
     - "22"
@@ -28,9 +18,10 @@
     - uno-choice
     - slack
     - extensible-choice-parameter
-   jenkins_jobs:
-    - "TESTPIPELINE"
-
+    - pipeline-stage-step
+    - delivery-pipeline-plugin
+    - pipeline-stage-view
+    
    gitlab_external_url: "http://192.168.86.86/"
    gitlab_redirect_http_to_https: "false"
    gitlab_omniauth_block_auto_create_users: "false"
@@ -43,6 +34,9 @@
     - geerlingguy.git
     - geerlingguy.gitlab
     - jxn.python-gitlab-modules
+
+#- jenkins_job:
+#    name: SUPERTEST
 
 - name: "Install ansible"
   hosts: all
@@ -71,6 +65,8 @@
         - docker
         - python-virtualenv
         - expect
+        - python2-gitlab
+        - python2-jenkins
       state: present
     become: true
 
@@ -93,22 +89,22 @@
        update: yes
 
 # - name: "Create GitLab User"
-#   become: true
+#   #become: true
 #   gitlab_user:
-#     api_url: http://192.168.86.86/
+#     api_url: http://192.168.86.86:80
 #     validate_certs: False
 #     api_username: root
 #     api_password: "5iveL!fe"
 #     name: Gitlab-Admin
-#     username: gitlabadmin
-#     password: gitlabadmin
+#     username: root
+#     password: toortoortoot
 #     email: gitlabadmin@example.com
-#     #sshkey_name: MySSH
-#     #sshkey_file: ssh-rsa AAAAB3NzaC1yc...
+      #sshkey_name: MySSH
+      #sshkey_file: ssh-rsa AAAAB3NzaC1yc...
 #     state: present
 #     group: super_group/mon_group
 #     access_level: owner
-#     delegate_to: localhost
+    #delegate_to: localhost
 
   - name: "configuring external url"
     become: true
@@ -139,7 +135,7 @@
     ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='http://192.168.86.86:example/timeoff-management-application.git'
     tags: configuration
 
-  
+ 
 # - name: "Gitlab create project"
 #   become: true
 #   gitlab_project:
