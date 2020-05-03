@@ -124,7 +124,7 @@ pipeline {
 				script{ 
 							try {
 								
-								sh "docker-compose rm -f "	
+								sh "/usr/local/bin/docker-compose rm -f "	
 							//	sh "docker run -d -p 3000:3000 --name docker-tom  'timeoff-management-application:${BUILD_NUMBER}'"
 								sh "/usr/local/bin/docker-compose up -d"
 								sh "docker ps"	
