@@ -33,12 +33,12 @@ The downloaded resources of interest should be in the following structure:
 ```bash
 ├── jenkins-configs
 │   ├── jobs
-│   │   ├── TOM
-    └──      ├── config
+│   │   └── TOM
+│   └──      └── config.xml
 ├── mishosts
 ├── playbookG.yaml
 ├── requirements.yml
-├── vagrantfile	
+└── vagrantfile	
 
 ```
 
