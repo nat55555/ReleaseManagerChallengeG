@@ -46,7 +46,9 @@ The downloaded resources of interest should be in the following structure:
 ├── mishosts
 ├── playbookG.yaml
 ├── requirements.yml
-└── vagrantfile	
+├── vagrantfile	
+├── example.crt
+└── example.key	
 
 ```
 This process deploys a forked version of timeoff management app hosted in: https://github.com/timeoff-management/timeoff-management-application.
@@ -62,7 +64,7 @@ In the forked repo https://github.com/nat55555/timeoff-management-application th
     
 2. Run
 
-    `vagrant up
+    `vagrant up`
     
     Wait until the comand finishes it's execution, this may take a couple minutes.
     
@@ -81,9 +83,19 @@ In the forked repo https://github.com/nat55555/timeoff-management-application th
 
 5. Check App
 
-   After the pipeline execution, you can open the TimeOff.Management application opening http://192.168.86.86:3333/ in your browser.
+   After the pipeline completes it's execution, you can access the TimeOff.Management application by opening http://192.168.86.86:3333/ in your browser.
 
-## TO DO'S
+
+## Loose Ends
+
+- The initial approach considered using GitLab as a local git repository, however the GitLab role did not work as planned (issues with Ansible resources and not being able to skip the initial change password GUI).
+- Without a local GitLab it was not possible to activate the web-hook (public ip cannot reach private ip).
+- Then, the option left was a GitHub SCM poll and the implementation was done that way (but more time would be needed for the right testing).
+- Initial Artifactory approach did not work due to a known issue in Centos 7 for the role tested.
+- Nexus default image does not run over SSL by default and the docker push command in recent versions does not support pushing to unsecure repos.
+- More time would be needed to deploy an SSL version of a repository manager (for instance Apache reverse proxy for Nexus) -Stage to deploy to Nexus server is left commented on the Jenkins file to be tested with the SSL Nexus-.
+
+## To-do list
 
 ### SSL
 - Run Jenkins Over SSL to imporve security
@@ -95,6 +107,8 @@ In the forked repo https://github.com/nat55555/timeoff-management-application th
 
 ### TOOLS
 - Set up static code analyzer
+- Set up notifications to e-mail or Slack channel -Slack example was left comented in the jenkinsfile-
 
 ### PROCESS
 - Define and implement a strategy for monitoring the application in production
+
