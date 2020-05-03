@@ -21,11 +21,25 @@ This setup allows the CI/CD
 
 ## Base files
 
-Clone the gitlab
+Clone the gitlab ReleaseManager Resources
 
 ```bash
 git clone https://github.com/nat55555/ReleaseManagerChallengeG.git ReleaseManagerChallengeG
 cd ReleaseManagerChallengeG
+```
+
+The downloaded resources of interest should be in the following structure:
+
+```bash
+├── jenkins-configs
+│   ├── jobs
+│   │   ├── TOM
+    └──      ├── config
+├── mishosts
+├── playbookG.yaml
+├── requirements.yml
+├── vagrantfile	
+
 ```
 
 ## Instructions
