@@ -17,7 +17,15 @@ Release Manager Challenge
 
 ## Overview
 
-This setup deploys the required infrastructure and components to run CI/CD of TimeOff.Management application. 
+This setup deploys the required infrastructure and components to run TimeOff.Management application in a CI/CD environment. 
+  
+**Required Infrastructure - Deployment Diagram**
+![Required Infrastructure - Deployment Diagram](https://github.com/nat55555/ReleaseManagerChallengeG/blob/master/docs/images/deployment-diagram.png)  
+  
+**Application CI/CD Configuration**
+![Application CI/CD Configuration](https://github.com/nat55555/ReleaseManagerChallengeG/blob/master/docs/images/ci-cd-diagram.png)  
+  
+For details about the TimeOff.Management application, refer to the application's [Readme](https://github.com/nat55555/timeoff-management-application/blob/master/README.md) file 
 
 ## Base files
 
@@ -43,7 +51,7 @@ The downloaded resources of interest should be in the following structure:
 ```
 This process deploys a forked version of timeoff management app hosted in: https://github.com/timeoff-management/timeoff-management-application.
 
-In the forked repo https://github.com/nat55555/timeoff-management-applicationse the following files have been added/modified: docker-compose.yml, Dockerfile and Jenkinsfile
+In the forked repo https://github.com/nat55555/timeoff-management-application the following files have been added/modified: docker-compose.yml, Dockerfile and Jenkinsfile
 
 
 ## Instructions
@@ -54,7 +62,9 @@ In the forked repo https://github.com/nat55555/timeoff-management-applicationse 
     
 2. Run
 
-    vagrant up
+    `vagrant up
+    
+    Wait until the comand finishes it's execution, this may take a couple minutes.
     
 3. Check connectivity to applications
 
@@ -67,8 +77,11 @@ In the forked repo https://github.com/nat55555/timeoff-management-applicationse 
    Check the existence of the job TOM (this is a pre-defined job that can be used to deploy the app)  
    Click the "configure" icon and save (to reload Sandbox)  
    Click build (the first execution will fail due to lack of parameters)
+   Click "Build with parameters" and select the branch from which you want to deploy the code
 
-5. Monitor App 
+5. Check App
+
+   After the pipeline execution, you can open the TimeOff.Management application opening http://192.168.86.86:3333/ in your browser.
 
 ## TO DO'S
 
