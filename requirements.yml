@@ -1,5 +1,10 @@
 ---
+- src: geerlingguy.repo-epel
 - src: geerlingguy.firewall
-- src: geerlingguy.ansible
 - src: geerlingguy.java
 - src: geerlingguy.jenkins
+- src: geerlingguy.git
+- src: geerlingguy.pip
+- src: geerlingguy.docker
+- src: geerlingguy.ansible
+- src: savoirfairelinux.nexus3-oss
