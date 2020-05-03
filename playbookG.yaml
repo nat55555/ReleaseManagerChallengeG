@@ -26,6 +26,9 @@
    gitlab_redirect_http_to_https: "false"
    gitlab_omniauth_block_auto_create_users: "false"
 
+   pip_install_packages:
+      - name: docker
+
   roles:
     - geerlingguy.repo-epel
     - geerlingguy.firewall    
@@ -33,6 +36,8 @@
     - geerlingguy.jenkins
     - geerlingguy.git
     - geerlingguy.gitlab
+    - geerlingguy.pip
+    - geerlingguy.docker
     - jxn.python-gitlab-modules
 
 #- jenkins_job:
@@ -62,7 +67,7 @@
   - name: "Install a list of packages"
     yum:
       name:
-        - docker
+        #- docker
         - python-virtualenv
         - expect
         - python2-gitlab
@@ -70,16 +75,16 @@
       state: present
     become: true
 
-  - name: "Make sure a service is running"
-    systemd:
-      state: started
-      name: docker
-      enabled: yes
-      daemon_reload: yes
+#  - name: "Make sure a service is running"
+#    systemd:
+#      state: started
+#      name: docker
+#      enabled: yes
+#      daemon_reload: yes
 
-  - name: "Add Jenkins User to docker Group"
-    become: true
-    shell: 'groupadd docker; usermod -a -G docker jenkins; chmod 777 /var/run/docker.sock'
+#  - name: "Add Jenkins User to docker Group"
+#    become: true
+#    shell: 'groupadd docker; usermod -a -G docker jenkins; chmod 777 /var/run/docker.sock'
 
   - name: "Clone the Git repo"
     git:
