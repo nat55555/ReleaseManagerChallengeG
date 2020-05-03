@@ -53,8 +53,8 @@
               <sandbox>false</sandbox>
             </secureFallbackScript>
           </script>
-          <projectName>TESTPIPELINE</projectName>
-          <projectFullName>TESTPIPELINE</projectFullName>
+          <projectName>TOM</projectName>
+          <projectFullName>TOM</projectFullName>
           <choiceType>PT_SINGLE_SELECT</choiceType>
           <filterable>false</filterable>
           <filterLength>1</filterLength>

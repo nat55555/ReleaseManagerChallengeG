@@ -13,7 +13,9 @@
 
    jenkins_http_port: 9999
    jenkins_plugins:
+    - git
     - gitlab-plugin
+    - github
     - pipeline-model-definition
     - uno-choice
     - slack
@@ -22,9 +24,9 @@
     - delivery-pipeline-plugin
     - pipeline-stage-view
     
-   gitlab_external_url: "http://192.168.86.86/"
-   gitlab_redirect_http_to_https: "false"
-   gitlab_omniauth_block_auto_create_users: "false"
+   #gitlab_external_url: "http://192.168.86.86/"
+   #gitlab_redirect_http_to_https: "false"
+   #gitlab_omniauth_block_auto_create_users: "false"
 
    pip_install_packages:
       - name: docker
@@ -35,13 +37,29 @@
     - geerlingguy.java
     - geerlingguy.jenkins
     - geerlingguy.git
-    - geerlingguy.gitlab
+    #- geerlingguy.gitlab
     - geerlingguy.pip
     - geerlingguy.docker
-    - jxn.python-gitlab-modules
+    #- jxn.python-gitlab-modules
 
-#- jenkins_job:
-#    name: SUPERTEST
+  tasks:
+
+    - name: "Copy Jenkins jobs into place."
+      copy:
+        src: "jenkins-configs/jobs"
+        dest: "/var/lib/jenkins"
+      notify: "restart jenkins"
+      become: true
+      become_user: jenkins
+      tags: ['jenkins']
+
+#    - name: "Add Insecure register"
+#      become: true
+#      copy:
+#        content: '{"insecure-registries" : ["192.168.86.86:8081"]}'
+#        dest: "/etc/docker/daemon.json"
+#        mode: 777
+
 
 - name: "Install ansible"
   hosts: all
@@ -52,15 +70,23 @@
 - name: "Install nexus"
   hosts: all
   become: true
-  roles:    
+  
+  vars:
+    httpd_server_name: 'nexus.vm'
+    httpd_setup_enable: true
+    httpd_ssl_certificate_file: "{{ vault_httpd_ssl_certificate_file }}"
+    httpd_ssl_certificate_key_file: "{{ vault_httpd_ssl_certificate_key_file }}"
+  
+  roles:
+    - geerlingguy.apache    
     - savoirfairelinux.nexus3-oss
 
-- name: "Mirror a Git repository with Ansible"
-  hosts: all
-  become: true
-  vars:
-    git_dir: /tmp/timeoff-management-application.git
-    gitlab_disable_signup: true
+#- name: "Mirror a Git repository with Ansible"
+#  hosts: all
+#  become: true
+#  vars:
+#    git_dir: /tmp/timeoff-management-application.git
+#    gitlab_disable_signup: true
 
   tasks:
 
@@ -75,23 +101,23 @@
       state: present
     become: true
 
-#  - name: "Make sure a service is running"
-#    systemd:
-#      state: started
-#      name: docker
-#      enabled: yes
-#      daemon_reload: yes
+  - name: "Restart Jenkins"
+    systemd:
+      state: started
+      name: jenkins
+      enabled: yes
+      daemon_reload: yes
 
 #  - name: "Add Jenkins User to docker Group"
 #    become: true
 #    shell: 'groupadd docker; usermod -a -G docker jenkins; chmod 777 /var/run/docker.sock'
 
-  - name: "Clone the Git repo"
-    git:
-       repo: 'https://github.com/nat55555/timeoff-management-application.git'
-       dest: '{{ git_dir }}'
-       clone: yes
-       update: yes
+#  - name: "Clone the Git repo"
+#    git:
+#       repo: 'https://github.com/nat55555/timeoff-management-application.git'
+#       dest: '{{ git_dir }}'
+#       clone: yes
+#       update: yes
 
 # - name: "Create GitLab User"
 #   #become: true
@@ -111,34 +137,34 @@
 #     access_level: owner
     #delegate_to: localhost
 
-  - name: "configuring external url"
-    become: true
-    lineinfile: 'dest=/etc/gitlab/gitlab.rb line="{{ item }}"'
-    with_items:
-      - "gitlab_rails['initial_root_password'] = 'toortoortoor'"
-      - "gitlab_rails['password_authentication_enabled'] = false"
-      - "nginx['redirect_http_to_https'] = false"
+#  - name: "configuring external url"
+#    become: true
+#    lineinfile: 'dest=/etc/gitlab/gitlab.rb line="{{ item }}"'
+#    with_items:
+#      - "gitlab_rails['initial_root_password'] = 'toortoortoor'"
+#      - "gitlab_rails['password_authentication_enabled'] = false"
+#      - "nginx['redirect_http_to_https'] = false"
 
-  - name: "disabling signup"
-    become: true
-    shell: expect -c 'spawn gitlab-rails console production;
-                      expect "%s";
-                      send "x = ApplicationSetting.first\r";
-                      expect "%s";
-                      send "x.signup_enabled = false\r";
-                      expect "%s";
-                      send "x.save!\r";
-                      expect "%s";
-                      send "^D"'
-    when: gitlab_disable_signup
+#  - name: "disabling signup"
+#    become: true
+#    shell: expect -c 'spawn gitlab-rails console production;
+#                      expect "%s";
+#                      send "x = ApplicationSetting.first\r";
+#                      expect "%s";
+#                      send "x.signup_enabled = false\r";
+#                      expect "%s";
+#                      send "x.save!\r";
+#                      expect "%s";
+#                      send "^D"'
+#    when: gitlab_disable_signup
 
-  - name: "configuring gitlab"
-    become: true
-    shell: 'gitlab-ctl reconfigure'
+#  - name: "configuring gitlab"
+#    become: true
+#    shell: 'gitlab-ctl reconfigure'
 
-  - name: "Add alternate remote"
-    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='http://192.168.86.86:example/timeoff-management-application.git'
-    tags: configuration
+#  - name: "Add alternate remote"
+#    ini_file: dest={{ git_dir }}/.git/config section='remote \"mirrored\"' option=url value='http://192.168.86.86:example/timeoff-management-application.git'
+#    tags: configuration
 
  
 # - name: "Gitlab create project"
