@@ -4,8 +4,16 @@ Release Manager Challenge
 ## Pre requisites
 
 - ansible
+
+  For MacOS: `brew install ansible`
+
 - vagrant
+
+  For MacOS: `brew cask install vagrant`
+
 - virtualbox
+
+  For MacOS: `brew cask install virtualbox`
 
 ## About
 
@@ -14,9 +22,17 @@ This setup allows the CI/CD
 ## Instructions
 
 1. Install depenencies
-2. Run vagrant up
+    
+    ansible-galaxy install -r requirements.yml 
+    
+2. Run
+
+    vagrant up
+    
 3. Check connectivity to applications
+
 4. Check CI/CD setup
+
 5. Monitor App 
 
 ## TODOS
