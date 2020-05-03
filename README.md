@@ -41,6 +41,10 @@ The downloaded resources of interest should be in the following structure:
 └── vagrantfile	
 
 ```
+This process deploys a forked version of timeoff management app hosted in: https://github.com/timeoff-management/timeoff-management-application.
+
+The fork https://github.com/nat55555/timeoff-management-applicationse had some files added/modified: docker-compose.yml, Dockerfile y Jenkinsfile
+
 
 ## Instructions
 
